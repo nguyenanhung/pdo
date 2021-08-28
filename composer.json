@@ -8,7 +8,7 @@
         "mysql",
         "pdo"
     ],
-    "homepage": "https://github.com/nguyenanhung/database",
+    "homepage": "https://github.com/nguyenanhung/pdo",
     "license": "GPL-3.0",
     "authors": [
         {
@@ -22,7 +22,6 @@
         "php": ">=7.0",
         "ext-json": "*",
         "ext-pdo": "*",
-        "ext-mysqli": "*",
         "faapz/pdo": "^2.1"
     },
     "require-dev": {
