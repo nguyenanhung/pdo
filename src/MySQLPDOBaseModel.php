@@ -23,7 +23,7 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION       = '1.0.0';
+    const VERSION       = '1.0.1';
     const LAST_MODIFIED = '2021-08-28';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
@@ -110,7 +110,6 @@ class MySQLPDOBaseModel
             }
         }
 
-
         if (!empty($database)) {
             $this->database = $database;
         }
@@ -143,6 +142,36 @@ class MySQLPDOBaseModel
     public function getVersion(): string
     {
         return self::VERSION;
+    }
+
+    /**
+     * Function setPrimaryKey
+     *
+     * @param $primaryKey
+     *
+     * @return $this
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 08/28/2021 34:28
+     */
+    public function setPrimaryKey($primaryKey)
+    {
+        $this->primaryKey = $primaryKey;
+
+        return $this;
+    }
+
+    /**
+     * Function getPrimaryKey
+     *
+     * @return string
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 08/02/2020 41:53
+     */
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
     }
 
     /**
