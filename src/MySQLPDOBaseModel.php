@@ -23,8 +23,8 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION       = '1.0.2';
-    const LAST_MODIFIED = '2021-08-28';
+    const VERSION       = '2.0.0';
+    const LAST_MODIFIED = '2021-09-07';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
     const PROJECT_NAME  = 'Database Wrapper - PDO Database Model';
@@ -68,16 +68,16 @@ class MySQLPDOBaseModel
     protected $db;
 
     /** @var bool Cấu hình trạng thái Debug, TRUE nếu bật, FALSE nếu tắt */
-    public $debugStatus = FALSE;
+    public $debugStatus = false;
 
     /** @var null|string Cấu hình Level Debug */
-    public $debugLevel = NULL;
+    public $debugLevel = null;
 
     /** @var null|bool|string Cấu hình thư mục lưu trữ Log, VD: /your/to/path */
-    public $debugLoggerPath = NULL;
+    public $debugLoggerPath = null;
 
     /** @var null|string Cấu hình File Log, VD: Log-2018-10-15.log | Log-date('Y-m-d').log */
-    public $debugLoggerFilename = NULL;
+    public $debugLoggerFilename = null;
 
     /** @var string Primary Key Default */
     public $primaryKey = 'id';
@@ -92,9 +92,9 @@ class MySQLPDOBaseModel
      */
     public function __construct(array $database = [])
     {
-        if (class_exists('\nguyenanhung\MyDebug\Debug')) {
-            $this->debug = new \nguyenanhung\MyDebug\Debug();
-            if ($this->debugStatus === TRUE) {
+        if (class_exists('nguyenanhung\MyDebug\Logger')) {
+            $this->debug = new \nguyenanhung\MyDebug\Logger();
+            if ($this->debugStatus === true) {
                 $this->debug->setDebugStatus($this->debugStatus);
                 if ($this->debugLevel) {
                     $this->debug->setGlobalLoggerLevel($this->debugLevel);
@@ -154,7 +154,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 08/28/2021 34:28
      */
-    public function setPrimaryKey($primaryKey)
+    public function setPrimaryKey($primaryKey): MySQLPDOBaseModel
     {
         $this->primaryKey = $primaryKey;
 
@@ -169,7 +169,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 08/02/2020 41:53
      */
-    public function getPrimaryKey()
+    public function getPrimaryKey(): string
     {
         return $this->primaryKey;
     }
@@ -210,7 +210,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:12
      */
-    public function setDatabase($database = [], $name = 'default')
+    public function setDatabase(array $database = [], string $name = 'default'): MySQLPDOBaseModel
     {
         $this->database = $database;
         $this->dbName   = $name;
@@ -241,7 +241,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:22
      */
-    public function setTable($table = '')
+    public function setTable(string $table = ''): MySQLPDOBaseModel
     {
         $this->table = $table;
 
@@ -269,7 +269,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:31
      */
-    public function connection()
+    public function connection(): MySQLPDOBaseModel
     {
         if (!is_object($this->db)) {
             $this->db = new Database(
@@ -292,10 +292,10 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:37
      */
-    public function disconnect()
+    public function disconnect(): MySQLPDOBaseModel
     {
         if (isset($this->db)) {
-            $this->db = NULL;
+            $this->db = null;
         }
 
         return $this;
@@ -324,7 +324,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 45:10
      */
-    public function countAll($select = ['id'])
+    public function countAll($select = ['id']): int
     {
         $this->connection();
         $total = $this->db->select($select)->from($this->table)->execute()->rowCount();
@@ -346,7 +346,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/16/18 11:45
      */
-    public function checkExists($whereValue = '', $whereField = 'id', $select = ['*'])
+    public function checkExists($whereValue = '', $whereField = 'id', $select = ['*']): int
     {
         $this->connection();
         $db = $this->db->select($select)->from($this->table);
@@ -380,7 +380,7 @@ class MySQLPDOBaseModel
      * @copyright : 713uk13m <dev@nguyenanhung.com>
      * @time      : 10/16/18 11:45
      */
-    public function checkExistsWithMultipleWhere($whereValue = '', $whereField = 'id', $select = ['*'])
+    public function checkExistsWithMultipleWhere($whereValue = '', $whereField = 'id', $select = ['*']): int
     {
         $this->connection();
         $db = $this->db->select($select)->from($this->table);
@@ -412,7 +412,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 53:20
      */
-    public function getLatest($selectField = ['*'], $byColumn = 'created_at')
+    public function getLatest(array $selectField = ['*'], string $byColumn = 'created_at')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -438,7 +438,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 54:15
      */
-    public function getOldest($selectField = ['*'], $byColumn = 'created_at')
+    public function getOldest(array $selectField = ['*'], string $byColumn = 'created_at')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -469,7 +469,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/16/18 11:51
      */
-    public function getInfo($value = '', $field = 'id', $format = NULL, $selectField = NULL)
+    public function getInfo($value = '', $field = 'id', $format = null, $selectField = null)
     {
         $this->connection();
         $format = strtolower($format);
@@ -522,7 +522,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 56:15
      */
-    public function getInfoWithMultipleWhere($wheres = '', $field = 'id', $format = NULL, $selectField = NULL)
+    public function getInfoWithMultipleWhere($wheres = '', $field = 'id', $format = null, $selectField = null)
     {
         $this->connection();
         $format = strtolower($format);
@@ -598,7 +598,7 @@ class MySQLPDOBaseModel
         if (isset($result->$fieldOutput)) {
             return $result->$fieldOutput;
         } else {
-            return NULL;
+            return null;
         }
     }
 
@@ -638,7 +638,7 @@ class MySQLPDOBaseModel
         if (isset($result->$fieldOutput)) {
             return $result->$fieldOutput;
         } else {
-            return NULL;
+            return null;
         }
     }
 
@@ -694,7 +694,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 59:54
      */
-    public function getResult($wheres = array(), $selectField = '*', $options = NULL)
+    public function getResult($wheres = array(), $selectField = '*', $options = null)
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -739,7 +739,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 47:38
      */
-    public function getResultWithMultipleWhere($wheres = array(), $selectField = '*', $options = NULL)
+    public function getResultWithMultipleWhere($wheres = array(), $selectField = '*', $options = null)
     {
         $this->connection();
         if (!is_array($selectField)) {
