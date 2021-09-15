@@ -49,13 +49,12 @@ class MySQLPDOUtilsModel extends MySQLPDOBaseModel
             $this->connection();
             $this->db->exec($statement);
 
-            return TRUE;
-        }
-        catch (Exception $e) {
-            $this->debug->error(__FUNCTION__, 'Error Message: ' . $e->getMessage());
-            $this->debug->error(__FUNCTION__, 'Error Trace As String: ' . $e->getTraceAsString());
+            return true;
+        } catch (Exception $e) {
+            $this->logger->error(__FUNCTION__, 'Error Message: ' . $e->getMessage());
+            $this->logger->error(__FUNCTION__, 'Error Trace As String: ' . $e->getTraceAsString());
 
-            return FALSE;
+            return false;
         }
     }
 }

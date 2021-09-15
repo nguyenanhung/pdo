@@ -23,8 +23,8 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION       = '2.0.0';
-    const LAST_MODIFIED = '2021-09-07';
+    const VERSION       = '2.0.1';
+    const LAST_MODIFIED = '2021-09-15';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
     const PROJECT_NAME  = 'Database Wrapper - PDO Database Model';
@@ -52,8 +52,8 @@ class MySQLPDOBaseModel
     const ORDER_ASCENDING                   = 'ASC';
     const ORDER_DESCENDING                  = 'DESC';
 
-    /** @var \nguyenanhung\MyDebug\Debug Đối tượng khởi tạo dùng gọi đến Class Debug */
-    protected $debug;
+    /** @var \nguyenanhung\MyDebug\Logger Đối tượng khởi tạo dùng gọi đến Class Debug */
+    protected $logger;
 
     /** @var array|null Mảng dữ liệu chứa thông tin database cần kết nối tới */
     protected $database;
@@ -64,7 +64,7 @@ class MySQLPDOBaseModel
     /** @var string|null Bảng cần lấy dữ liệu */
     protected $table;
 
-    /** @var object Database */
+    /** @var Database $db */
     protected $db;
 
     /** @var bool Cấu hình trạng thái Debug, TRUE nếu bật, FALSE nếu tắt */
@@ -93,26 +93,45 @@ class MySQLPDOBaseModel
     public function __construct(array $database = [])
     {
         if (class_exists('nguyenanhung\MyDebug\Logger')) {
-            $this->debug = new \nguyenanhung\MyDebug\Logger();
+            $this->logger = new \nguyenanhung\MyDebug\Logger();
             if ($this->debugStatus === true) {
-                $this->debug->setDebugStatus($this->debugStatus);
+                $this->logger->setDebugStatus($this->debugStatus);
                 if ($this->debugLevel) {
-                    $this->debug->setGlobalLoggerLevel($this->debugLevel);
+                    $this->logger->setGlobalLoggerLevel($this->debugLevel);
                 }
                 if ($this->debugLoggerPath) {
-                    $this->debug->setLoggerPath($this->debugLoggerPath);
+                    $this->logger->setLoggerPath($this->debugLoggerPath);
                 }
                 if (empty($this->debugLoggerFilename)) {
                     $this->debugLoggerFilename = 'Log-' . date('Y-m-d') . '.log';
                 }
-                $this->debug->setLoggerSubPath(__CLASS__);
-                $this->debug->setLoggerFilename($this->debugLoggerFilename);
+                $this->logger->setLoggerSubPath(__CLASS__);
+                $this->logger->setLoggerFilename($this->debugLoggerFilename);
             }
         }
 
         if (!empty($database)) {
             $this->database = $database;
         }
+        $this->setupDatabaseConnection();
+    }
+
+    /**
+     * PDOBaseModel destructor.
+     */
+    public function __destruct()
+    {
+    }
+
+    /**
+     * Function setupDatabaseConnection
+     *
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 09/16/2021 53:08
+     */
+    protected function setupDatabaseConnection()
+    {
         if (is_array($this->database) && !empty($this->database)) {
             $this->db = new Database(
                 $this->database['driver'] . ':host=' . $this->database['host'] . ';port=' . $this->database['port'] . ';dbname=' . $this->database['database'] . ';charset=' . $this->database['charset'] . ';collation=' . $this->database['collation'] . ';prefix=' . $this->database['prefix'],
@@ -122,13 +141,6 @@ class MySQLPDOBaseModel
             );
             $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         }
-    }
-
-    /**
-     * PDOBaseModel destructor.
-     */
-    public function __destruct()
-    {
     }
 
     /**
@@ -272,13 +284,7 @@ class MySQLPDOBaseModel
     public function connection(): MySQLPDOBaseModel
     {
         if (!is_object($this->db)) {
-            $this->db = new Database(
-                $this->database['driver'] . ':host=' . $this->database['host'] . ';port=' . $this->database['port'] . ';dbname=' . $this->database['database'] . ';charset=' . $this->database['charset'] . ';collation=' . $this->database['collation'] . ';prefix=' . $this->database['prefix'],
-                $this->database['username'],
-                $this->database['password'],
-                $this->database['options']
-            );
-            $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+            $this->setupDatabaseConnection();
         }
 
         return $this;
@@ -304,12 +310,12 @@ class MySQLPDOBaseModel
     /**
      * Function getDb
      *
-     * @return \FaaPz\PDO\Database|object
+     * @return \FaaPz\PDO\Database
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
-     * @time     : 10/09/2020 44:42
+     * @time     : 09/16/2021 55:24
      */
-    public function getDb()
+    public function getDb(): Database
     {
         return $this->db;
     }
@@ -327,11 +333,10 @@ class MySQLPDOBaseModel
     public function countAll($select = ['id']): int
     {
         $this->connection();
-        $total = $this->db->select($select)->from($this->table)->execute()->rowCount();
 
-        //$this->debug->debug(__FUNCTION__, 'Total Result: ' . $total);
+        //$this->logger->debug(__FUNCTION__, 'Total Result: ' . $total);
 
-        return $total;
+        return $this->db->select($select)->from($this->table)->execute()->rowCount();
     }
 
     /**
@@ -346,7 +351,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/16/18 11:45
      */
-    public function checkExists($whereValue = '', $whereField = 'id', $select = ['*']): int
+    public function checkExists($whereValue = '', string $whereField = 'id', $select = ['*']): int
     {
         $this->connection();
         $db = $this->db->select($select)->from($this->table);
@@ -361,11 +366,10 @@ class MySQLPDOBaseModel
         } else {
             $db->where(new Conditional($whereField, self::OPERATOR_EQUAL_TO, $whereValue));
         }
-        $total = $db->execute()->rowCount();
 
-        //$this->debug->debug(__FUNCTION__, 'Total Result: ' . $total);
+        //$this->logger->debug(__FUNCTION__, 'Total Result: ' . $total);
 
-        return $total;
+        return $db->execute()->rowCount();
     }
 
     /**
@@ -380,7 +384,7 @@ class MySQLPDOBaseModel
      * @copyright : 713uk13m <dev@nguyenanhung.com>
      * @time      : 10/16/18 11:45
      */
-    public function checkExistsWithMultipleWhere($whereValue = '', $whereField = 'id', $select = ['*']): int
+    public function checkExistsWithMultipleWhere($whereValue = '', string $whereField = 'id', $select = ['*']): int
     {
         $this->connection();
         $db = $this->db->select($select)->from($this->table);
@@ -421,7 +425,7 @@ class MySQLPDOBaseModel
         $db = $this->db->select($selectField)->from($this->table);
         $db->orderBy($byColumn, self::ORDER_DESCENDING)->limit(new Limit(1));
 
-        // $this->debug->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
+        // $this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
         return $db->execute()->fetch();
     }
 
@@ -447,7 +451,7 @@ class MySQLPDOBaseModel
         $db = $this->db->select($selectField)->from($this->table);
         $db->orderBy($byColumn, self::ORDER_ASCENDING)->limit(new Limit(1));
 
-        // $this->debug->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
+        // $this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
 
         return $db->execute()->fetch();
     }
@@ -469,7 +473,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/16/18 11:51
      */
-    public function getInfo($value = '', $field = 'id', $format = null, $selectField = null)
+    public function getInfo($value = '', string $field = 'id', string $format = null, $selectField = null)
     {
         $this->connection();
         $format = strtolower($format);
@@ -494,14 +498,14 @@ class MySQLPDOBaseModel
         }
         if ($format == 'result') {
             $result = $db->execute()->fetchAll();
-            //$this->debug->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
+            //$this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
         } else {
             $result = $db->execute()->fetch();
-            //$this->debug->debug(__FUNCTION__, 'Format is get first Result => ' . json_encode($result));
+            //$this->logger->debug(__FUNCTION__, 'Format is get first Result => ' . json_encode($result));
         }
-        //$this->debug->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
+        //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
         if ($format == 'json') {
-            //$this->debug->debug(__FUNCTION__, 'Output Result is Json');
+            //$this->logger->debug(__FUNCTION__, 'Output Result is Json');
 
             return json_encode($result);
         } else {
@@ -512,17 +516,17 @@ class MySQLPDOBaseModel
     /**
      * Function getInfoWithMultipleWhere
      *
-     * @param string $wheres
-     * @param string $field
-     * @param null   $format
-     * @param null   $selectField
+     * @param string|array $wheres
+     * @param string       $field
+     * @param null         $format
+     * @param null         $selectField
      *
      * @return array|false|mixed|string
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 56:15
      */
-    public function getInfoWithMultipleWhere($wheres = '', $field = 'id', $format = null, $selectField = null)
+    public function getInfoWithMultipleWhere($wheres = '', string $field = 'id', $format = null, $selectField = null)
     {
         $this->connection();
         $format = strtolower($format);
@@ -534,6 +538,7 @@ class MySQLPDOBaseModel
             $selectField = ['*'];
         }
         $db = $this->db->select($selectField)->from($this->table);
+
         if (is_array($wheres) && count($wheres) > 0) {
             foreach ($wheres as $value) {
                 if (is_array($value['value'])) {
@@ -545,16 +550,17 @@ class MySQLPDOBaseModel
         } else {
             $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $wheres));
         }
+
         if ($format == 'result') {
             $result = $db->execute()->fetchAll();
-            //$this->debug->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
+            //$this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
         } else {
             $result = $db->execute()->fetch();
-            //$this->debug->debug(__FUNCTION__, 'Format is get first Result => ' . json_encode($result));
+            //$this->logger->debug(__FUNCTION__, 'Format is get first Result => ' . json_encode($result));
         }
-        //$this->debug->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
+        //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
         if ($format == 'json') {
-            //$this->debug->debug(__FUNCTION__, 'Output Result is Json');
+            //$this->logger->debug(__FUNCTION__, 'Output Result is Json');
 
             return json_encode($result);
         } else {
@@ -565,16 +571,16 @@ class MySQLPDOBaseModel
     /**
      * Function getValue
      *
-     * @param string $value
-     * @param string $field
-     * @param string $fieldOutput
+     * @param string|array $value
+     * @param string       $field
+     * @param string       $fieldOutput
      *
      * @return   mixed|null
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 58:06
      */
-    public function getValue($value = '', $field = 'id', $fieldOutput = '')
+    public function getValue($value = '', string $field = 'id', string $fieldOutput = '')
     {
         $this->connection();
         if (!is_array($fieldOutput)) {
@@ -594,7 +600,7 @@ class MySQLPDOBaseModel
         }
         $result = $db->execute()->fetch();
 
-        //$this->debug->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
+        //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
         if (isset($result->$fieldOutput)) {
             return $result->$fieldOutput;
         } else {
@@ -605,16 +611,16 @@ class MySQLPDOBaseModel
     /**
      * Function getValueWithMultipleWhere
      *
-     * @param string $wheres
-     * @param string $field
-     * @param string $fieldOutput
+     * @param string|array $wheres
+     * @param string       $field
+     * @param string       $fieldOutput
      *
      * @return   mixed|null
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 58:54
      */
-    public function getValueWithMultipleWhere($wheres = '', $field = 'id', $fieldOutput = '')
+    public function getValueWithMultipleWhere($wheres = array(), string $field = 'id', string $fieldOutput = '')
     {
         $this->connection();
         if (!is_array($fieldOutput)) {
@@ -634,7 +640,7 @@ class MySQLPDOBaseModel
         }
         $result = $db->execute()->fetch();
 
-        //$this->debug->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
+        //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
         if (isset($result->$fieldOutput)) {
             return $result->$fieldOutput;
         } else {
@@ -652,7 +658,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 59:24
      */
-    public function getDistinctResult($selectField = '')
+    public function getDistinctResult(string $selectField = ''): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -660,7 +666,7 @@ class MySQLPDOBaseModel
         }
         $db = $this->db->select($selectField)->from($this->table)->distinct();
 
-        //$this->debug->debug(__FUNCTION__, 'Result from DB => ' . json_encode($result));
+        //$this->logger->debug(__FUNCTION__, 'Result from DB => ' . json_encode($result));
 
         return $db->execute()->fetchAll();
     }
@@ -677,7 +683,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 59:37
      */
-    public function getResultDistinct($selectField = '')
+    public function getResultDistinct(string $selectField = ''): array
     {
         return $this->getDistinctResult($selectField);
     }
@@ -694,7 +700,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 59:54
      */
-    public function getResult($wheres = array(), $selectField = '*', $options = null)
+    public function getResult(array $wheres = array(), string $selectField = '*', $options = null): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -722,7 +728,7 @@ class MySQLPDOBaseModel
             }
         }
 
-        // $this->debug->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
+        // $this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
 
         return $db->execute()->fetchAll();
     }
@@ -739,7 +745,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 47:38
      */
-    public function getResultWithMultipleWhere($wheres = array(), $selectField = '*', $options = null)
+    public function getResultWithMultipleWhere(array $wheres = array(), string $selectField = '*', $options = null): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -765,7 +771,7 @@ class MySQLPDOBaseModel
             }
         }
 
-        // $this->debug->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
+        // $this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
 
         return $db->execute()->fetchAll();
     }
@@ -781,7 +787,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 48:26
      */
-    public function countResult($wheres = array(), $selectField = '*')
+    public function countResult(array $wheres = array(), string $selectField = '*'): int
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -808,12 +814,12 @@ class MySQLPDOBaseModel
      *
      * @param array $data
      *
-     * @return int|string
+     * @return mixed|\PDOStatement
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
-     * @time     : 10/09/2020 49:03
+     * @time     : 09/16/2021 00:32
      */
-    public function add($data = array())
+    public function add(array $data = array())
     {
         $this->connection();
 
@@ -831,7 +837,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 50:08
      */
-    public function update($data = array(), $wheres = array())
+    public function update(array $data = array(), array $wheres = array()): int
     {
         $this->connection();
         $db = $this->db->update($data);
@@ -846,11 +852,10 @@ class MySQLPDOBaseModel
         } else {
             $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
         }
-        $resultId = $db->execute();
 
-        //$this->debug->debug(__FUNCTION__, 'Result Update Rows: ' . $resultId);
+        //$this->logger->debug(__FUNCTION__, 'Result Update Rows: ' . $resultId);
 
-        return $resultId;
+        return $db->execute();
     }
 
     /**
@@ -863,7 +868,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 50:03
      */
-    public function delete($wheres = array())
+    public function delete(array $wheres = array()): int
     {
         $this->connection();
         $db = $this->db->delete($this->table);
@@ -878,10 +883,9 @@ class MySQLPDOBaseModel
         } else {
             $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
         }
-        $resultId = $db->execute();
 
-        //$this->debug->debug(__FUNCTION__, 'Result Delete Rows: ' . $resultId);
+        //$this->logger->debug(__FUNCTION__, 'Result Delete Rows: ' . $resultId);
 
-        return $resultId;
+        return $db->execute();
     }
 }
