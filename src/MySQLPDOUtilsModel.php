@@ -31,6 +31,12 @@ class MySQLPDOUtilsModel extends MySQLPDOBaseModel
     public function __construct(array $database = [])
     {
         parent::__construct($database);
+        $this->database = $database;
+        if (class_exists('nguyenanhung\MyDebug\Logger')) {
+            if ($this->debugStatus === true) {
+                $this->logger->setLoggerSubPath(__CLASS__);
+            }
+        }
     }
 
     /**

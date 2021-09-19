@@ -23,34 +23,34 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION       = '2.0.1';
-    const LAST_MODIFIED = '2021-09-15';
-    const AUTHOR_NAME   = 'Hung Nguyen';
-    const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
-    const PROJECT_NAME  = 'Database Wrapper - PDO Database Model';
+    public const VERSION       = '2.0.2';
+    public const LAST_MODIFIED = '2021-09-20';
+    public const AUTHOR_NAME   = 'Hung Nguyen';
+    public const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
+    public const PROJECT_NAME  = 'Database Wrapper - PDO Database Model';
 
-    const OPERATOR_EQUAL_TO                 = '=';
-    const OP_EQ                             = '=';
-    const OPERATOR_NOT_EQUAL_TO             = '!=';
-    const OP_NE                             = '!=';
-    const OPERATOR_LESS_THAN                = '<';
-    const OP_LT                             = '<';
-    const OPERATOR_LESS_THAN_OR_EQUAL_TO    = '<=';
-    const OP_LTE                            = '<=';
-    const OPERATOR_GREATER_THAN             = '>';
-    const OP_GT                             = '>';
-    const OPERATOR_GREATER_THAN_OR_EQUAL_TO = '>=';
-    const OP_GTE                            = '>=';
-    const OPERATOR_IS_SPACESHIP             = '<=>';
-    const OPERATOR_IS_IN                    = 'IN';
-    const OPERATOR_IS_LIKE                  = 'LIKE';
-    const OPERATOR_IS_LIKE_BINARY           = 'LIKE BINARY';
-    const OPERATOR_IS_ILIKE                 = 'ilike';
-    const OPERATOR_IS_NOT_LIKE              = 'NOT LIKE';
-    const OPERATOR_IS_NULL                  = 'IS NULL';
-    const OPERATOR_IS_NOT_NULL              = 'IS NOT NULL';
-    const ORDER_ASCENDING                   = 'ASC';
-    const ORDER_DESCENDING                  = 'DESC';
+    public const OPERATOR_EQUAL_TO                 = '=';
+    public const OP_EQ                             = '=';
+    public const OPERATOR_NOT_EQUAL_TO             = '!=';
+    public const OP_NE                             = '!=';
+    public const OPERATOR_LESS_THAN                = '<';
+    public const OP_LT                             = '<';
+    public const OPERATOR_LESS_THAN_OR_EQUAL_TO    = '<=';
+    public const OP_LTE                            = '<=';
+    public const OPERATOR_GREATER_THAN             = '>';
+    public const OP_GT                             = '>';
+    public const OPERATOR_GREATER_THAN_OR_EQUAL_TO = '>=';
+    public const OP_GTE                            = '>=';
+    public const OPERATOR_IS_SPACESHIP             = '<=>';
+    public const OPERATOR_IS_IN                    = 'IN';
+    public const OPERATOR_IS_LIKE                  = 'LIKE';
+    public const OPERATOR_IS_LIKE_BINARY           = 'LIKE BINARY';
+    public const OPERATOR_IS_ILIKE                 = 'ilike';
+    public const OPERATOR_IS_NOT_LIKE              = 'NOT LIKE';
+    public const OPERATOR_IS_NULL                  = 'IS NULL';
+    public const OPERATOR_IS_NOT_NULL              = 'IS NOT NULL';
+    public const ORDER_ASCENDING                   = 'ASC';
+    public const ORDER_DESCENDING                  = 'DESC';
 
     /** @var \nguyenanhung\MyDebug\Logger Đối tượng khởi tạo dùng gọi đến Class Debug */
     protected $logger;
@@ -71,13 +71,13 @@ class MySQLPDOBaseModel
     public $debugStatus = false;
 
     /** @var null|string Cấu hình Level Debug */
-    public $debugLevel = null;
+    public $debugLevel = 'error';
 
     /** @var null|bool|string Cấu hình thư mục lưu trữ Log, VD: /your/to/path */
-    public $debugLoggerPath = null;
+    public $debugLoggerPath = '';
 
     /** @var null|string Cấu hình File Log, VD: Log-2018-10-15.log | Log-date('Y-m-d').log */
-    public $debugLoggerFilename = null;
+    public $debugLoggerFilename = '';
 
     /** @var string Primary Key Default */
     public $primaryKey = 'id';
@@ -130,7 +130,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 09/16/2021 53:08
      */
-    protected function setupDatabaseConnection()
+    protected function setupDatabaseConnection(): void
     {
         if (is_array($this->database) && !empty($this->database)) {
             $this->db = new Database(
@@ -199,7 +199,7 @@ class MySQLPDOBaseModel
      */
     public function preparePaging(int $pageIndex = 1, int $pageSize = 10): array
     {
-        if ($pageIndex != 0) {
+        if ($pageIndex !== 0) {
             if (!$pageIndex || $pageIndex <= 0 || empty($pageIndex)) {
                 $pageIndex = 1;
             }
@@ -238,7 +238,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:18
      */
-    public function getDatabase()
+    public function getDatabase(): ?array
     {
         return $this->database;
     }
@@ -268,7 +268,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:26
      */
-    public function getTable()
+    public function getTable(): ?string
     {
         return $this->table;
     }
@@ -496,7 +496,7 @@ class MySQLPDOBaseModel
         } else {
             $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $value));
         }
-        if ($format == 'result') {
+        if ($format === 'result') {
             $result = $db->execute()->fetchAll();
             //$this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
         } else {
@@ -504,13 +504,13 @@ class MySQLPDOBaseModel
             //$this->logger->debug(__FUNCTION__, 'Format is get first Result => ' . json_encode($result));
         }
         //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
-        if ($format == 'json') {
+        if ($format === 'json') {
             //$this->logger->debug(__FUNCTION__, 'Output Result is Json');
 
             return json_encode($result);
-        } else {
-            return $result;
         }
+
+        return $result;
     }
 
     /**
@@ -551,7 +551,7 @@ class MySQLPDOBaseModel
             $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $wheres));
         }
 
-        if ($format == 'result') {
+        if ($format === 'result') {
             $result = $db->execute()->fetchAll();
             //$this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
         } else {
@@ -559,13 +559,13 @@ class MySQLPDOBaseModel
             //$this->logger->debug(__FUNCTION__, 'Format is get first Result => ' . json_encode($result));
         }
         //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
-        if ($format == 'json') {
+        if ($format === 'json') {
             //$this->logger->debug(__FUNCTION__, 'Output Result is Json');
 
             return json_encode($result);
-        } else {
-            return $result;
         }
+
+        return $result;
     }
 
     /**
@@ -573,7 +573,7 @@ class MySQLPDOBaseModel
      *
      * @param string|array $value
      * @param string       $field
-     * @param string       $fieldOutput
+     * @param string|array $fieldOutput
      *
      * @return   mixed|null
      * @author   : 713uk13m <dev@nguyenanhung.com>
@@ -601,11 +601,7 @@ class MySQLPDOBaseModel
         $result = $db->execute()->fetch();
 
         //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
-        if (isset($result->$fieldOutput)) {
-            return $result->$fieldOutput;
-        } else {
-            return null;
-        }
+        return $result->$fieldOutput ?? null;
     }
 
     /**
@@ -613,7 +609,7 @@ class MySQLPDOBaseModel
      *
      * @param string|array $wheres
      * @param string       $field
-     * @param string       $fieldOutput
+     * @param string|array $fieldOutput
      *
      * @return   mixed|null
      * @author   : 713uk13m <dev@nguyenanhung.com>
@@ -641,17 +637,13 @@ class MySQLPDOBaseModel
         $result = $db->execute()->fetch();
 
         //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
-        if (isset($result->$fieldOutput)) {
-            return $result->$fieldOutput;
-        } else {
-            return null;
-        }
+        return $result->$fieldOutput ?? null;
     }
 
     /**
      * Hàm lấy danh sách Distinct toàn bộ bản ghi trong 1 bảng
      *
-     * @param string $selectField Mảng dữ liệu danh sách các field cần so sánh
+     * @param string|array $selectField Mảng dữ liệu danh sách các field cần so sánh
      *
      * @return array
      * @author   : 713uk13m <dev@nguyenanhung.com>
@@ -691,9 +683,9 @@ class MySQLPDOBaseModel
     /**
      * Function getResult
      *
-     * @param array  $wheres
-     * @param string $selectField
-     * @param null   $options
+     * @param array        $wheres
+     * @param string|array $selectField
+     * @param null         $options
      *
      * @return array
      * @author   : 713uk13m <dev@nguyenanhung.com>
@@ -718,7 +710,7 @@ class MySQLPDOBaseModel
         } else {
             $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
         }
-        if ((isset($options['limit']) && $options['limit'] > 0) && isset($options['offset'])) {
+        if (isset($options['limit'], $options['offset']) && $options['limit'] > 0) {
             $page = $this->preparePaging($options['offset'], $options['limit']);
             $db->limit(new Limit($page['limit'], $page['offset']));
         }
@@ -736,9 +728,9 @@ class MySQLPDOBaseModel
     /**
      * Function getResultWithMultipleWhere
      *
-     * @param array  $wheres
-     * @param string $selectField
-     * @param null   $options
+     * @param array        $wheres
+     * @param string|array $selectField
+     * @param null         $options
      *
      * @return array
      * @author   : 713uk13m <dev@nguyenanhung.com>
@@ -761,7 +753,7 @@ class MySQLPDOBaseModel
                 }
             }
         }
-        if ((isset($options['limit']) && $options['limit'] > 0) && isset($options['offset'])) {
+        if (isset($options['limit'], $options['offset']) && $options['limit'] > 0) {
             $page = $this->preparePaging($options['offset'], $options['limit']);
             $db->limit(new Limit($page['limit'], $page['offset']));
         }
@@ -779,8 +771,8 @@ class MySQLPDOBaseModel
     /**
      * Function countResult
      *
-     * @param array  $wheres
-     * @param string $selectField
+     * @param array        $wheres
+     * @param string|array $selectField
      *
      * @return int
      * @author   : 713uk13m <dev@nguyenanhung.com>
