@@ -47,7 +47,7 @@ class MySQLPDOUtilsModel extends MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 09/24/2021 59:32
      */
-    public function rawExecStatement($statement = '')
+    public function rawExecStatement(string $statement = ''): bool
     {
         try {
             $this->connection();
