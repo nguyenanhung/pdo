@@ -32,10 +32,8 @@ class MySQLPDOUtilsModel extends MySQLPDOBaseModel
     {
         parent::__construct($database);
         $this->database = $database;
-        if (class_exists('nguyenanhung\MyDebug\Logger')) {
-            if ($this->debugStatus === true) {
-                $this->logger->setLoggerSubPath(__CLASS__);
-            }
+        if ($this->debugStatus === true && class_exists('nguyenanhung\MyDebug\Logger')) {
+            $this->logger->setLoggerSubPath(__CLASS__);
         }
     }
 
@@ -47,9 +45,9 @@ class MySQLPDOUtilsModel extends MySQLPDOBaseModel
      * @return bool
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
-     * @time     : 08/28/2021 34:45
+     * @time     : 09/24/2021 59:32
      */
-    public function rawExecStatement(string $statement = ''): bool
+    public function rawExecStatement($statement = '')
     {
         try {
             $this->connection();
