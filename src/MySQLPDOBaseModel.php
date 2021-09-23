@@ -151,7 +151,7 @@ class MySQLPDOBaseModel
      *
      * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return self::VERSION;
     }
@@ -166,7 +166,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 08/28/2021 34:28
      */
-    public function setPrimaryKey($primaryKey)
+    public function setPrimaryKey($primaryKey): MySQLPDOBaseModel
     {
         $this->primaryKey = $primaryKey;
 
@@ -181,7 +181,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 08/02/2020 41:53
      */
-    public function getPrimaryKey()
+    public function getPrimaryKey(): string
     {
         return $this->primaryKey;
     }
@@ -197,7 +197,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 08/21/2021 23:24
      */
-    public function preparePaging($pageIndex = 1, $pageSize = 10)
+    public function preparePaging(int $pageIndex = 1, int $pageSize = 10): array
     {
         if ($pageIndex !== 0) {
             if (!$pageIndex || $pageIndex <= 0 || empty($pageIndex)) {
@@ -222,7 +222,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:12
      */
-    public function setDatabase($database = array(), $name = 'default')
+    public function setDatabase(array $database = array(), string $name = 'default'): MySQLPDOBaseModel
     {
         $this->database = $database;
         $this->dbName   = $name;
@@ -253,7 +253,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:22
      */
-    public function setTable($table = '')
+    public function setTable(string $table = ''): MySQLPDOBaseModel
     {
         $this->table = $table;
 
@@ -281,7 +281,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:31
      */
-    public function connection()
+    public function connection(): MySQLPDOBaseModel
     {
         if (!is_object($this->db)) {
             $this->setupDatabaseConnection();
@@ -298,7 +298,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 44:37
      */
-    public function disconnect()
+    public function disconnect(): MySQLPDOBaseModel
     {
         if (isset($this->db)) {
             $this->db = null;
@@ -315,7 +315,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 09/16/2021 55:24
      */
-    public function getDb()
+    public function getDb(): Database
     {
         return $this->db;
     }
@@ -330,7 +330,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 45:10
      */
-    public function countAll($select = ['id'])
+    public function countAll($select = ['id']): int
     {
         $this->connection();
 
@@ -351,7 +351,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/16/18 11:45
      */
-    public function checkExists($whereValue = '', $whereField = 'id', $select = array('*'))
+    public function checkExists($whereValue = '', string $whereField = 'id', $select = array('*')): int
     {
         $this->connection();
         $db = $this->db->select($select)->from($this->table);
@@ -384,7 +384,7 @@ class MySQLPDOBaseModel
      * @copyright : 713uk13m <dev@nguyenanhung.com>
      * @time      : 10/16/18 11:45
      */
-    public function checkExistsWithMultipleWhere($whereValue = '', $whereField = 'id', $select = array('*'))
+    public function checkExistsWithMultipleWhere($whereValue = '', string $whereField = 'id', $select = array('*')): int
     {
         $this->connection();
         $db = $this->db->select($select)->from($this->table);
@@ -416,7 +416,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 53:20
      */
-    public function getLatest(array $selectField = array('*'), $byColumn = 'created_at')
+    public function getLatest(array $selectField = array('*'), string $byColumn = 'created_at')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -442,7 +442,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 54:15
      */
-    public function getOldest(array $selectField = array('*'), $byColumn = 'created_at')
+    public function getOldest(array $selectField = array('*'), string $byColumn = 'created_at')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -463,17 +463,17 @@ class MySQLPDOBaseModel
      *
      * Lấy bản ghi đầu tiên phù hợp với điều kiện
      *
-     * @param array|string      $value       Giá trị cần kiểm tra
-     * @param null|string       $field       Field tương ứng, ví dụ: ID
-     * @param null|string       $format      Format dữ liệu đầu ra: null, json, array, base, result
-     * @param null|string|array $selectField Các field cần lấy
+     * @param array|string $value       Giá trị cần kiểm tra
+     * @param string|null  $field       Field tương ứng, ví dụ: ID
+     * @param string|null  $format      Format dữ liệu đầu ra: null, json, array, base, result
+     * @param mixed        $selectField Các field cần lấy
      *
      * @return object|array|string|null Mảng|String|Object dữ liều phụ hợp với yêu cầu map theo biến format truyền vào
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/16/18 11:51
      */
-    public function getInfo($value = '', $field = 'id', $format = null, $selectField = null)
+    public function getInfo($value = '', string $field = 'id', string $format = null, $selectField = null)
     {
         $this->connection();
         $format = strtolower($format);
@@ -517,16 +517,16 @@ class MySQLPDOBaseModel
      * Function getInfoWithMultipleWhere
      *
      * @param string|array $wheres
-     * @param string       $field
-     * @param null         $format
-     * @param null         $selectField
+     * @param string|null  $field       Field tương ứng, ví dụ: ID
+     * @param string|null  $format      Format dữ liệu đầu ra: null, json, array, base, result
+     * @param mixed        $selectField Các field cần lấy
      *
      * @return array|false|mixed|string
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 56:15
      */
-    public function getInfoWithMultipleWhere($wheres = '', $field = 'id', $format = null, $selectField = null)
+    public function getInfoWithMultipleWhere($wheres = '', string $field = 'id', string $format = null, $selectField = null)
     {
         $this->connection();
         $format = strtolower($format);
@@ -580,7 +580,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 58:06
      */
-    public function getValue($value = '', $field = 'id', $fieldOutput = '')
+    public function getValue($value = '', string $field = 'id', $fieldOutput = '')
     {
         $this->connection();
         if (!is_array($fieldOutput)) {
@@ -601,11 +601,7 @@ class MySQLPDOBaseModel
         $result = $db->execute()->fetch();
 
         //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
-        if (isset($result->$fieldOutput)) {
-            return $result->$fieldOutput;
-        }
-
-        return null;
+        return $result->$fieldOutput ?? null;
     }
 
     /**
@@ -620,7 +616,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 58:54
      */
-    public function getValueWithMultipleWhere($wheres = array(), $field = 'id', $fieldOutput = '')
+    public function getValueWithMultipleWhere($wheres = array(), string $field = 'id', $fieldOutput = '')
     {
         $this->connection();
         if (!is_array($fieldOutput)) {
@@ -641,11 +637,7 @@ class MySQLPDOBaseModel
         $result = $db->execute()->fetch();
 
         //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
-        if (isset($result->$fieldOutput)) {
-            return $result->$fieldOutput;
-        }
-
-        return null;
+        return $result->$fieldOutput ?? null;
     }
 
     /**
@@ -658,7 +650,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 59:24
      */
-    public function getDistinctResult($selectField = '')
+    public function getDistinctResult($selectField = ''): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -683,7 +675,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 59:37
      */
-    public function getResultDistinct($selectField = '')
+    public function getResultDistinct(string $selectField = ''): array
     {
         return $this->getDistinctResult($selectField);
     }
@@ -700,7 +692,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 59:54
      */
-    public function getResult($wheres = array(), $selectField = '*', $options = null)
+    public function getResult(array $wheres = array(), $selectField = '*', $options = null): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -745,7 +737,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 47:38
      */
-    public function getResultWithMultipleWhere($wheres = array(), $selectField = '*', $options = null)
+    public function getResultWithMultipleWhere(array $wheres = array(), $selectField = '*', $options = null): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -787,7 +779,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 48:26
      */
-    public function countResult($wheres = array(), $selectField = '*')
+    public function countResult(array $wheres = array(), $selectField = '*'): int
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -837,7 +829,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 50:08
      */
-    public function update(array $data = array(), array $wheres = array())
+    public function update(array $data = array(), array $wheres = array()): int
     {
         $this->connection();
         $db = $this->db->update($data);
@@ -868,7 +860,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 50:03
      */
-    public function delete(array $wheres = array())
+    public function delete(array $wheres = array()): int
     {
         $this->connection();
         $db = $this->db->delete($this->table);
