@@ -23,8 +23,8 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION       = '3.0.0';
-    const LAST_MODIFIED = '2021-09-24';
+    const VERSION       = '3.0.1';
+    const LAST_MODIFIED = '2022-06-10';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
     const PROJECT_NAME  = 'Database Wrapper - PDO Database Model';
@@ -430,6 +430,43 @@ class MySQLPDOBaseModel
     }
 
     /**
+     * Function getLatestByColumn - Hàm lấy bản ghi mới nhất theo điều kiện sâu hơn
+     *
+     * @param array        $wheres
+     * @param string|array $selectField
+     * @param string       $column
+     * @param string       $fields
+     *
+     * @return mixed
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 10/06/2022 28:55
+     */
+    public function getLatestByColumn(array $wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
+    {
+        $this->connection();
+        if (!is_array($selectField)) {
+            $selectField = [$selectField];
+        }
+        $db = $this->db->select($selectField)->from($this->table);
+        if (is_array($wheres) && count($wheres) > 0) {
+            foreach ($wheres as $value) {
+                if (is_array($value['value'])) {
+                    $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
+                } else {
+                    $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+                }
+            }
+        } else {
+            $db->where(new Conditional($fields, self::OPERATOR_EQUAL_TO, $wheres));
+        }
+        $db->orderBy($column, self::ORDER_DESCENDING)->limit(new Limit(1));
+
+        // $this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
+        return $db->execute()->fetch();
+    }
+
+    /**
      * Function getOldest - Hàm lấy bản ghi cũ nhất nhất theo điều kiện
      *
      * Mặc định giá trị so sánh dựa trên column created_at
@@ -453,6 +490,43 @@ class MySQLPDOBaseModel
 
         // $this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
 
+        return $db->execute()->fetch();
+    }
+
+    /**
+     * Function getOldestByColumn - Hàm lấy bản ghi cũ nhất theo điều kiện sâu hơn
+     *
+     * @param array        $wheres
+     * @param string|array $selectField
+     * @param string       $column
+     * @param string       $fields
+     *
+     * @return mixed
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 10/06/2022 28:55
+     */
+    public function getOldestByColumn(array $wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
+    {
+        $this->connection();
+        if (!is_array($selectField)) {
+            $selectField = [$selectField];
+        }
+        $db = $this->db->select($selectField)->from($this->table);
+        if (is_array($wheres) && count($wheres) > 0) {
+            foreach ($wheres as $value) {
+                if (is_array($value['value'])) {
+                    $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
+                } else {
+                    $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+                }
+            }
+        } else {
+            $db->where(new Conditional($fields, self::OPERATOR_EQUAL_TO, $wheres));
+        }
+        $db->orderBy($column, self::ORDER_ASCENDING)->limit(new Limit(1));
+
+        // $this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
         return $db->execute()->fetch();
     }
 
