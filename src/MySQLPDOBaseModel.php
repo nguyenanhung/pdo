@@ -23,7 +23,9 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION       = '3.0.1';
+    use Support;
+
+    const VERSION       = '3.0.2';
     const LAST_MODIFIED = '2022-06-10';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
