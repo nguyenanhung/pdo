@@ -25,7 +25,7 @@ class MySQLPDOBaseModel
 {
     use Support;
 
-    const VERSION       = '3.0.3';
+    const VERSION       = '3.0.4';
     const LAST_MODIFIED = '2022-06-18';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
@@ -419,8 +419,8 @@ class MySQLPDOBaseModel
      *
      * Mặc định giá trị so sánh dựa trên column created_at
      *
-     * @param array  $selectField Danh sách các column cần lấy
-     * @param string $byColumn    Column cần so sánh dữ liệu, mặc định sẽ sử dụng column created_at
+     * @param string|array $selectField Danh sách các column cần lấy
+     * @param string       $byColumn    Column cần so sánh dữ liệu, mặc định sẽ sử dụng column created_at
      *
      * @return mixed
      * @author   : 713uk13m <dev@nguyenanhung.com>
@@ -443,7 +443,7 @@ class MySQLPDOBaseModel
     /**
      * Function getLatestByColumn - Hàm lấy bản ghi mới nhất theo điều kiện sâu hơn
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      * @param string       $column
      * @param string       $fields
@@ -486,8 +486,8 @@ class MySQLPDOBaseModel
      *
      * Mặc định giá trị so sánh dựa trên column created_at
      *
-     * @param array  $selectField Danh sách các column cần lấy
-     * @param string $byColumn    Column cần so sánh dữ liệu, mặc định sẽ sử dụng column created_at
+     * @param string|array $selectField Danh sách các column cần lấy
+     * @param string       $byColumn    Column cần so sánh dữ liệu, mặc định sẽ sử dụng column created_at
      *
      * @return mixed
      * @author   : 713uk13m <dev@nguyenanhung.com>
@@ -511,7 +511,7 @@ class MySQLPDOBaseModel
     /**
      * Function getOldestByColumn - Hàm lấy bản ghi cũ nhất theo điều kiện sâu hơn
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      * @param string       $column
      * @param string       $fields
@@ -793,7 +793,7 @@ class MySQLPDOBaseModel
     /**
      * Function getResult
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      * @param null         $options
      *
@@ -842,7 +842,7 @@ class MySQLPDOBaseModel
     /**
      * Function getResultWithMultipleWhere
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      * @param null         $options
      *
@@ -889,7 +889,7 @@ class MySQLPDOBaseModel
     /**
      * Function countResult
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      *
      * @return int
@@ -943,8 +943,8 @@ class MySQLPDOBaseModel
     /**
      * Function update
      *
-     * @param array $data
-     * @param array $wheres
+     * @param array        $data
+     * @param string|array $wheres
      *
      * @return int
      * @author   : 713uk13m <dev@nguyenanhung.com>
@@ -979,7 +979,7 @@ class MySQLPDOBaseModel
     /**
      * Function delete
      *
-     * @param array $wheres
+     * @param string|array $wheres
      *
      * @return int
      * @author   : 713uk13m <dev@nguyenanhung.com>
