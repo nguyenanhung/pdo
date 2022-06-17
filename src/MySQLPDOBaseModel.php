@@ -25,7 +25,7 @@ class MySQLPDOBaseModel
 {
     use Support;
 
-    const VERSION       = '3.0.4';
+    const VERSION       = '3.0.5';
     const LAST_MODIFIED = '2022-06-18';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
@@ -427,7 +427,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 53:20
      */
-    public function getLatest(array $selectField = array('*'), string $byColumn = 'created_at')
+    public function getLatest($selectField = array('*'), string $byColumn = 'created_at')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -453,7 +453,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/06/2022 28:55
      */
-    public function getLatestByColumn(array $wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
+    public function getLatestByColumn($wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -494,7 +494,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 54:15
      */
-    public function getOldest(array $selectField = array('*'), string $byColumn = 'created_at')
+    public function getOldest($selectField = array('*'), string $byColumn = 'created_at')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -521,7 +521,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/06/2022 28:55
      */
-    public function getOldestByColumn(array $wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
+    public function getOldestByColumn($wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -802,7 +802,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 59:54
      */
-    public function getResult(array $wheres = array(), $selectField = '*', $options = null): array
+    public function getResult($wheres = array(), $selectField = '*', $options = null): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -851,7 +851,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 47:38
      */
-    public function getResultWithMultipleWhere(array $wheres = array(), $selectField = '*', $options = null): array
+    public function getResultWithMultipleWhere($wheres = array(), $selectField = '*', $options = null): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -897,7 +897,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 48:26
      */
-    public function countResult(array $wheres = array(), $selectField = '*'): int
+    public function countResult($wheres = array(), $selectField = '*'): int
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -951,7 +951,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 50:08
      */
-    public function update(array $data = array(), array $wheres = array()): int
+    public function update(array $data = array(), $wheres = array()): int
     {
         $this->connection();
         $db = $this->db->update($data);
@@ -986,7 +986,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 50:03
      */
-    public function delete(array $wheres = array()): int
+    public function delete($wheres = array()): int
     {
         $this->connection();
         $db = $this->db->delete($this->table);
