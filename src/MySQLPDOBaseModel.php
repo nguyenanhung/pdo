@@ -25,7 +25,7 @@ class MySQLPDOBaseModel
 {
     use Support;
 
-    const VERSION       = '3.0.3';
+    const VERSION       = '3.0.6';
     const LAST_MODIFIED = '2022-06-18';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
@@ -419,15 +419,15 @@ class MySQLPDOBaseModel
      *
      * Mặc định giá trị so sánh dựa trên column created_at
      *
-     * @param array  $selectField Danh sách các column cần lấy
-     * @param string $byColumn    Column cần so sánh dữ liệu, mặc định sẽ sử dụng column created_at
+     * @param string|array $selectField Danh sách các column cần lấy
+     * @param string       $byColumn    Column cần so sánh dữ liệu, mặc định sẽ sử dụng column created_at
      *
      * @return mixed
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 53:20
      */
-    public function getLatest(array $selectField = array('*'), string $byColumn = 'created_at')
+    public function getLatest($selectField = array('*'), string $byColumn = 'created_at')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -443,7 +443,7 @@ class MySQLPDOBaseModel
     /**
      * Function getLatestByColumn - Hàm lấy bản ghi mới nhất theo điều kiện sâu hơn
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      * @param string       $column
      * @param string       $fields
@@ -453,7 +453,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/06/2022 28:55
      */
-    public function getLatestByColumn(array $wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
+    public function getLatestByColumn($wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -486,15 +486,15 @@ class MySQLPDOBaseModel
      *
      * Mặc định giá trị so sánh dựa trên column created_at
      *
-     * @param array  $selectField Danh sách các column cần lấy
-     * @param string $byColumn    Column cần so sánh dữ liệu, mặc định sẽ sử dụng column created_at
+     * @param string|array $selectField Danh sách các column cần lấy
+     * @param string       $byColumn    Column cần so sánh dữ liệu, mặc định sẽ sử dụng column created_at
      *
      * @return mixed
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 54:15
      */
-    public function getOldest(array $selectField = array('*'), string $byColumn = 'created_at')
+    public function getOldest($selectField = array('*'), string $byColumn = 'created_at')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -511,7 +511,7 @@ class MySQLPDOBaseModel
     /**
      * Function getOldestByColumn - Hàm lấy bản ghi cũ nhất theo điều kiện sâu hơn
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      * @param string       $column
      * @param string       $fields
@@ -521,7 +521,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/06/2022 28:55
      */
-    public function getOldestByColumn(array $wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
+    public function getOldestByColumn($wheres = array(), $selectField = '*', string $column = 'id', string $fields = 'id')
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -793,7 +793,7 @@ class MySQLPDOBaseModel
     /**
      * Function getResult
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      * @param null         $options
      *
@@ -802,7 +802,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 59:54
      */
-    public function getResult(array $wheres = array(), $selectField = '*', $options = null): array
+    public function getResult($wheres = array(), $selectField = '*', $options = null): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -842,7 +842,7 @@ class MySQLPDOBaseModel
     /**
      * Function getResultWithMultipleWhere
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      * @param null         $options
      *
@@ -851,7 +851,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 47:38
      */
-    public function getResultWithMultipleWhere(array $wheres = array(), $selectField = '*', $options = null): array
+    public function getResultWithMultipleWhere($wheres = array(), $selectField = '*', $options = null): array
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -889,7 +889,7 @@ class MySQLPDOBaseModel
     /**
      * Function countResult
      *
-     * @param array        $wheres
+     * @param string|array $wheres
      * @param string|array $selectField
      *
      * @return int
@@ -897,7 +897,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 48:26
      */
-    public function countResult(array $wheres = array(), $selectField = '*'): int
+    public function countResult($wheres = array(), $selectField = '*'): int
     {
         $this->connection();
         if (!is_array($selectField)) {
@@ -943,15 +943,15 @@ class MySQLPDOBaseModel
     /**
      * Function update
      *
-     * @param array $data
-     * @param array $wheres
+     * @param array        $data
+     * @param string|array $wheres
      *
      * @return int
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 50:08
      */
-    public function update(array $data = array(), array $wheres = array()): int
+    public function update(array $data = array(), $wheres = array()): int
     {
         $this->connection();
         $db = $this->db->update($data);
@@ -979,14 +979,14 @@ class MySQLPDOBaseModel
     /**
      * Function delete
      *
-     * @param array $wheres
+     * @param string|array $wheres
      *
      * @return int
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 50:03
      */
-    public function delete(array $wheres = array()): int
+    public function delete($wheres = array()): int
     {
         $this->connection();
         $db = $this->db->delete($this->table);
