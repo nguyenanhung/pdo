@@ -25,7 +25,7 @@ class MySQLPDOBaseModel
 {
     use Support;
 
-    const VERSION       = '3.0.5';
+    const VERSION       = '3.0.6';
     const LAST_MODIFIED = '2022-06-18';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
