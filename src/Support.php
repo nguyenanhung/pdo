@@ -34,6 +34,7 @@ trait Support
     {
         $this->logger->error(__FUNCTION__, 'Error Message: ' . $e->getMessage());
         $this->logger->error(__FUNCTION__, 'Error Trace As String: ' . $e->getTraceAsString());
+
         return $exitCode;
     }
 }
