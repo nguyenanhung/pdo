@@ -23,8 +23,8 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION       = '2.0.4';
-    const LAST_MODIFIED = '2022-06-10';
+    const VERSION       = '2.0.5';
+    const LAST_MODIFIED = '2022-06-19';
     const AUTHOR_NAME   = 'Hung Nguyen';
     const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
     const PROJECT_NAME  = 'Database Wrapper - PDO Database Model';
@@ -200,7 +200,7 @@ class MySQLPDOBaseModel
     public function preparePaging($pageIndex = 1, $pageSize = 10)
     {
         if ($pageIndex !== 0) {
-            if (!$pageIndex || $pageIndex <= 0 || empty($pageIndex)) {
+            if ($pageIndex <= 0 || empty($pageIndex)) {
                 $pageIndex = 1;
             }
             $offset = ($pageIndex - 1) * $pageSize;
@@ -388,16 +388,18 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         $db = $this->db->select($select)->from($this->table);
-        if (is_array($whereValue) && count($whereValue) > 0) {
-            foreach ($whereValue as $value) {
-                if (is_array($value['value'])) {
-                    $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
-                } else {
-                    $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+        if (!empty($whereValue)) {
+            if (is_array($whereValue) && count($whereValue) > 0) {
+                foreach ($whereValue as $value) {
+                    if (is_array($value['value'])) {
+                        $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
+                    } else {
+                        $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+                    }
                 }
+            } else {
+                $db->where(new Conditional($whereField, self::OPERATOR_EQUAL_TO, $whereValue));
             }
-        } else {
-            $db->where(new Conditional($whereField, self::OPERATOR_EQUAL_TO, $whereValue));
         }
 
         return $db->execute()->rowCount();
@@ -449,16 +451,18 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table);
-        if (is_array($wheres) && count($wheres) > 0) {
-            foreach ($wheres as $value) {
-                if (is_array($value['value'])) {
-                    $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
-                } else {
-                    $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+        if (!empty($wheres)) {
+            if (is_array($wheres) && count($wheres) > 0) {
+                foreach ($wheres as $value) {
+                    if (is_array($value['value'])) {
+                        $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
+                    } else {
+                        $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+                    }
                 }
+            } else {
+                $db->where(new Conditional($fields, self::OPERATOR_EQUAL_TO, $wheres));
             }
-        } else {
-            $db->where(new Conditional($fields, self::OPERATOR_EQUAL_TO, $wheres));
         }
         $db->orderBy($column, self::ORDER_DESCENDING)->limit(new Limit(1));
 
@@ -514,16 +518,18 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table);
-        if (is_array($wheres) && count($wheres) > 0) {
-            foreach ($wheres as $value) {
-                if (is_array($value['value'])) {
-                    $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
-                } else {
-                    $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+        if (!empty($wheres)) {
+            if (is_array($wheres) && count($wheres) > 0) {
+                foreach ($wheres as $value) {
+                    if (is_array($value['value'])) {
+                        $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
+                    } else {
+                        $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+                    }
                 }
+            } else {
+                $db->where(new Conditional($fields, self::OPERATOR_EQUAL_TO, $wheres));
             }
-        } else {
-            $db->where(new Conditional($fields, self::OPERATOR_EQUAL_TO, $wheres));
         }
         $db->orderBy($column, self::ORDER_ASCENDING)->limit(new Limit(1));
 
@@ -560,16 +566,18 @@ class MySQLPDOBaseModel
             $selectField = array('*');
         }
         $db = $this->db->select($selectField)->from($this->table);
-        if (is_array($value) && count($value) > 0) {
-            foreach ($value as $f => $v) {
-                if (is_array($v)) {
-                    $db->where(new Conditional($f, self::OPERATOR_IS_IN, $v));
-                } else {
-                    $db->where(new Conditional($f, self::OPERATOR_EQUAL_TO, $v));
+        if (!empty($value)) {
+            if (is_array($value) && count($value) > 0) {
+                foreach ($value as $f => $v) {
+                    if (is_array($v)) {
+                        $db->where(new Conditional($f, self::OPERATOR_IS_IN, $v));
+                    } else {
+                        $db->where(new Conditional($f, self::OPERATOR_EQUAL_TO, $v));
+                    }
                 }
+            } else {
+                $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $value));
             }
-        } else {
-            $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $value));
         }
         if ($format === 'result') {
             $result = $db->execute()->fetchAll();
@@ -613,17 +621,18 @@ class MySQLPDOBaseModel
             $selectField = array('*');
         }
         $db = $this->db->select($selectField)->from($this->table);
-
-        if (is_array($wheres) && count($wheres) > 0) {
-            foreach ($wheres as $value) {
-                if (is_array($value['value'])) {
-                    $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
-                } else {
-                    $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+        if (!empty($wheres)) {
+            if (is_array($wheres) && count($wheres) > 0) {
+                foreach ($wheres as $value) {
+                    if (is_array($value['value'])) {
+                        $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
+                    } else {
+                        $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+                    }
                 }
+            } else {
+                $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $wheres));
             }
-        } else {
-            $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $wheres));
         }
 
         if ($format === 'result') {
@@ -662,16 +671,18 @@ class MySQLPDOBaseModel
             $fieldOutput = [$fieldOutput];
         }
         $db = $this->db->select($fieldOutput)->from($this->table);
-        if (is_array($value) && count($value) > 0) {
-            foreach ($value as $column => $column_value) {
-                if (is_array($column_value)) {
-                    $db->where(new Conditional($column, self::OPERATOR_IS_IN, $column_value));
-                } else {
-                    $db->where(new Conditional($column, self::OPERATOR_EQUAL_TO, $column_value));
+        if (!empty($value)) {
+            if (is_array($value) && count($value) > 0) {
+                foreach ($value as $column => $column_value) {
+                    if (is_array($column_value)) {
+                        $db->where(new Conditional($column, self::OPERATOR_IS_IN, $column_value));
+                    } else {
+                        $db->where(new Conditional($column, self::OPERATOR_EQUAL_TO, $column_value));
+                    }
                 }
+            } else {
+                $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $value));
             }
-        } else {
-            $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $value));
         }
         $result = $db->execute()->fetch();
 
@@ -702,16 +713,18 @@ class MySQLPDOBaseModel
             $fieldOutput = [$fieldOutput];
         }
         $db = $this->db->select($fieldOutput)->from($this->table);
-        if (is_array($wheres) && count($wheres) > 0) {
-            foreach ($wheres as $value) {
-                if (is_array($value['value'])) {
-                    $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
-                } else {
-                    $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+        if (!empty($wheres)) {
+            if (is_array($wheres) && count($wheres) > 0) {
+                foreach ($wheres as $value) {
+                    if (is_array($value['value'])) {
+                        $db->where(new Conditional($value['field'], self::OPERATOR_IS_IN, $value['value']));
+                    } else {
+                        $db->where(new Conditional($value['field'], $value['operator'], $value['value']));
+                    }
                 }
+            } else {
+                $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $wheres));
             }
-        } else {
-            $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $wheres));
         }
         $result = $db->execute()->fetch();
 
@@ -782,16 +795,18 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table);
-        if (is_array($wheres) && count($wheres) > 0) {
-            foreach ($wheres as $column => $column_value) {
-                if (is_array($column_value)) {
-                    $db->where(new Conditional($column, self::OPERATOR_IS_IN, $column_value));
-                } else {
-                    $db->where(new Conditional($column, self::OPERATOR_EQUAL_TO, $column_value));
+        if (!empty($wheres)) {
+            if (is_array($wheres) && count($wheres) > 0) {
+                foreach ($wheres as $column => $column_value) {
+                    if (is_array($column_value)) {
+                        $db->where(new Conditional($column, self::OPERATOR_IS_IN, $column_value));
+                    } else {
+                        $db->where(new Conditional($column, self::OPERATOR_EQUAL_TO, $column_value));
+                    }
                 }
+            } else {
+                $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
             }
-        } else {
-            $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
         }
         if (isset($options['limit'], $options['offset']) && $options['limit'] > 0) {
             $page = $this->preparePaging($options['offset'], $options['limit']);
@@ -813,7 +828,7 @@ class MySQLPDOBaseModel
      *
      * @param array        $wheres
      * @param string|array $selectField
-     * @param null         $options
+     * @param array|null   $options
      *
      * @return array
      * @author   : 713uk13m <dev@nguyenanhung.com>
@@ -827,12 +842,22 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table);
-        if (is_array($wheres) && count($wheres) > 0) {
-            foreach ($wheres as $column => $column_value) {
-                if (is_array($column_value)) {
-                    $db->where(new Conditional($column, self::OPERATOR_IS_IN, $column_value));
-                } else {
-                    $db->where(new Conditional($column, self::OPERATOR_EQUAL_TO, $column_value));
+        if (!empty($wheres)) {
+            if (is_array($wheres) && count($wheres) > 0) {
+                foreach ($wheres as $column => $column_value) {
+                    if (isset($column_value['operator'])) {
+                        if (is_array($column_value['value'])) {
+                            $db->where(new Conditional($column_value['field'], self::OPERATOR_IS_IN, $column_value['value']));
+                        } else {
+                            $db->where(new Conditional($column_value['field'], $column_value['operator'], $column_value['value']));
+                        }
+                    } else {
+                        if (is_array($column_value)) {
+                            $db->where(new Conditional($column, self::OPERATOR_IS_IN, $column_value));
+                        } else {
+                            $db->where(new Conditional($column, self::OPERATOR_EQUAL_TO, $column_value));
+                        }
+                    }
                 }
             }
         }
@@ -869,16 +894,28 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table);
-        if (is_array($wheres) && count($wheres) > 0) {
-            foreach ($wheres as $field => $value) {
-                if (is_array($value)) {
-                    $db->where(new Conditional($field, self::OPERATOR_IS_IN, $value));
-                } else {
-                    $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $value));
+
+
+        if (!empty($wheres)) {
+            if (is_array($wheres) && count($wheres) > 0) {
+                foreach ($wheres as $column => $column_value) {
+                    if (isset($column_value['operator'])) {
+                        if (is_array($column_value['value'])) {
+                            $db->where(new Conditional($column_value['field'], self::OPERATOR_IS_IN, $column_value['value']));
+                        } else {
+                            $db->where(new Conditional($column_value['field'], $column_value['operator'], $column_value['value']));
+                        }
+                    } else {
+                        if (is_array($column_value)) {
+                            $db->where(new Conditional($column, self::OPERATOR_IS_IN, $column_value));
+                        } else {
+                            $db->where(new Conditional($column, self::OPERATOR_EQUAL_TO, $column_value));
+                        }
+                    }
                 }
+            } else {
+                $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
             }
-        } else {
-            $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
         }
 
         return $db->execute()->rowCount();
@@ -889,16 +926,20 @@ class MySQLPDOBaseModel
      *
      * @param array $data
      *
-     * @return mixed|\PDOStatement
+     * @return int
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
-     * @time     : 09/16/2021 00:32
+     * @time     : 19/06/2022 20:59
      */
     public function add(array $data = array())
     {
         $this->connection();
+        $result = $this->db->insert($data)->into($this->table)->execute();
+        if ($result !== false) {
+            return $result->rowCount();
+        }
 
-        return $this->db->insert($data)->into($this->table)->execute();
+        return 0;
     }
 
     /**
@@ -910,27 +951,41 @@ class MySQLPDOBaseModel
      * @return int
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
-     * @time     : 10/09/2020 50:08
+     * @time     : 19/06/2022 20:20
      */
     public function update(array $data = array(), array $wheres = array())
     {
         $this->connection();
         $db = $this->db->update($data);
-        if (is_array($wheres) && count($wheres) > 0) {
-            foreach ($wheres as $field => $value) {
-                if (is_array($value)) {
-                    $db->where(new Conditional($field, self::OPERATOR_IS_IN, $value));
-                } else {
-                    $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $value));
+
+        if (!empty($wheres)) {
+            if (is_array($wheres) && count($wheres) > 0) {
+                foreach ($wheres as $column => $column_value) {
+                    if (isset($column_value['operator'])) {
+                        if (is_array($column_value['value'])) {
+                            $db->where(new Conditional($column_value['field'], self::OPERATOR_IS_IN, $column_value['value']));
+                        } else {
+                            $db->where(new Conditional($column_value['field'], $column_value['operator'], $column_value['value']));
+                        }
+                    } else {
+                        if (is_array($column_value)) {
+                            $db->where(new Conditional($column, self::OPERATOR_IS_IN, $column_value));
+                        } else {
+                            $db->where(new Conditional($column, self::OPERATOR_EQUAL_TO, $column_value));
+                        }
+                    }
                 }
+            } else {
+                $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
             }
-        } else {
-            $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
+        }
+        $result = $db->execute();
+        //$this->logger->debug(__FUNCTION__, 'Result Update Rows: ' . $result);
+        if ($result !== false) {
+            return $result->rowCount();
         }
 
-        //$this->logger->debug(__FUNCTION__, 'Result Update Rows: ' . $resultId);
-
-        return $db->execute();
+        return 0;
     }
 
     /**
@@ -941,26 +996,39 @@ class MySQLPDOBaseModel
      * @return int
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
-     * @time     : 10/09/2020 50:03
+     * @time     : 19/06/2022 19:51
      */
     public function delete(array $wheres = array())
     {
         $this->connection();
         $db = $this->db->delete($this->table);
-        if (is_array($wheres) && count($wheres) > 0) {
-            foreach ($wheres as $field => $value) {
-                if (is_array($value)) {
-                    $db->where(new Conditional($field, self::OPERATOR_IS_IN, $value));
-                } else {
-                    $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $value));
+        if (!empty($wheres)) {
+            if (is_array($wheres) && count($wheres) > 0) {
+                foreach ($wheres as $column => $column_value) {
+                    if (isset($column_value['operator'])) {
+                        if (is_array($column_value['value'])) {
+                            $db->where(new Conditional($column_value['field'], self::OPERATOR_IS_IN, $column_value['value']));
+                        } else {
+                            $db->where(new Conditional($column_value['field'], $column_value['operator'], $column_value['value']));
+                        }
+                    } else {
+                        if (is_array($column_value)) {
+                            $db->where(new Conditional($column, self::OPERATOR_IS_IN, $column_value));
+                        } else {
+                            $db->where(new Conditional($column, self::OPERATOR_EQUAL_TO, $column_value));
+                        }
+                    }
                 }
+            } else {
+                $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
             }
-        } else {
-            $db->where(new Conditional($this->primaryKey, self::OPERATOR_EQUAL_TO, $wheres));
+        }
+        $result = $db->execute();
+        //$this->logger->debug(__FUNCTION__, 'Result Delete Rows: ' . $result);
+        if ($result !== false) {
+            return $result->rowCount();
         }
 
-        //$this->logger->debug(__FUNCTION__, 'Result Delete Rows: ' . $resultId);
-
-        return $db->execute();
+        return 0;
     }
 }
