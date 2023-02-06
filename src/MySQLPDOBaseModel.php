@@ -23,37 +23,39 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION       = '2.0.5';
-    const LAST_MODIFIED = '2022-06-19';
-    const AUTHOR_NAME   = 'Hung Nguyen';
-    const AUTHOR_EMAIL  = 'dev@nguyenanhung.com';
-    const PROJECT_NAME  = 'Database Wrapper - PDO Database Model';
-
-    const OPERATOR_EQUAL_TO                 = '=';
-    const OP_EQ                             = '=';
-    const OPERATOR_NOT_EQUAL_TO             = '!=';
-    const OP_NE                             = '!=';
-    const OPERATOR_LESS_THAN                = '<';
-    const OP_LT                             = '<';
-    const OPERATOR_LESS_THAN_OR_EQUAL_TO    = '<=';
-    const OP_LTE                            = '<=';
-    const OPERATOR_GREATER_THAN             = '>';
-    const OP_GT                             = '>';
+    const VERSION = '2.0.6';
+    const LAST_MODIFIED = '2023-01-06';
+    const AUTHOR_NAME = 'Hung Nguyen';
+    const AUTHOR_EMAIL = 'dev@nguyenanhung.com';
+    const PROJECT_NAME = 'Database Wrapper - PDO Database Model';
+    const OPERATOR_EQUAL_TO = '=';
+    const OP_EQ = '=';
+    const OPERATOR_NOT_EQUAL_TO = '!=';
+    const OP_NE = '!=';
+    const OPERATOR_LESS_THAN = '<';
+    const OP_LT = '<';
+    const OPERATOR_LESS_THAN_OR_EQUAL_TO = '<=';
+    const OP_LTE = '<=';
+    const OPERATOR_GREATER_THAN = '>';
+    const OP_GT = '>';
     const OPERATOR_GREATER_THAN_OR_EQUAL_TO = '>=';
-    const OP_GTE                            = '>=';
-    const OPERATOR_IS_SPACESHIP             = '<=>';
-    const OPERATOR_IS_IN                    = 'IN';
-    const OPERATOR_IS_LIKE                  = 'LIKE';
-    const OPERATOR_IS_LIKE_BINARY           = 'LIKE BINARY';
-    const OPERATOR_IS_ILIKE                 = 'ilike';
-    const OPERATOR_IS_NOT_LIKE              = 'NOT LIKE';
-    const OPERATOR_IS_NULL                  = 'IS NULL';
-    const OPERATOR_IS_NOT_NULL              = 'IS NOT NULL';
-    const ORDER_ASCENDING                   = 'ASC';
-    const ORDER_DESCENDING                  = 'DESC';
+    const OP_GTE = '>=';
+    const OPERATOR_IS_SPACESHIP = '<=>';
+    const OPERATOR_IS_IN = 'IN';
+    const OPERATOR_IS_LIKE = 'LIKE';
+    const OPERATOR_IS_LIKE_BINARY = 'LIKE BINARY';
+    const OPERATOR_IS_ILIKE = 'ilike';
+    const OPERATOR_IS_NOT_LIKE = 'NOT LIKE';
+    const OPERATOR_IS_NULL = 'IS NULL';
+    const OPERATOR_IS_NOT_NULL = 'IS NOT NULL';
+    const ORDER_ASCENDING = 'ASC';
+    const ORDER_DESCENDING = 'DESC';
 
     /** @var \nguyenanhung\MyDebug\Logger Đối tượng khởi tạo dùng gọi đến Class Debug */
     protected $logger;
+
+    /** @var \nguyenanhung\MyDebug\Logger Đối tượng khởi tạo dùng gọi đến Class Debug */
+    protected $debug;
 
     /** @var array|null Mảng dữ liệu chứa thông tin database cần kết nối tới */
     protected $database;
@@ -109,7 +111,7 @@ class MySQLPDOBaseModel
                 $this->logger->setLoggerFilename($this->debugLoggerFilename);
             }
         }
-
+        $this->debug = $this->logger;
         if (!empty($database)) {
             $this->database = $database;
         }
@@ -225,7 +227,7 @@ class MySQLPDOBaseModel
     public function setDatabase($database = array(), $name = 'default')
     {
         $this->database = $database;
-        $this->dbName   = $name;
+        $this->dbName = $name;
 
         return $this;
     }
