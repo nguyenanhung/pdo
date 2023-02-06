@@ -35,6 +35,7 @@ class MySQLPDOUtilsModel extends MySQLPDOBaseModel
         if ($this->debugStatus === true && class_exists('nguyenanhung\MyDebug\Logger')) {
             $this->logger->setLoggerSubPath(__CLASS__);
         }
+        $this->debug = $this->logger;
     }
 
     /**
