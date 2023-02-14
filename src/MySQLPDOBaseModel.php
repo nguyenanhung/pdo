@@ -23,7 +23,7 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION = '2.0.7';
+    const VERSION = '2.0.8';
     const LAST_MODIFIED = '2023-01-14';
     const AUTHOR_NAME = 'Hung Nguyen';
     const AUTHOR_EMAIL = 'dev@nguyenanhung.com';
