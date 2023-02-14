@@ -23,7 +23,7 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION = '2.1.0';
+    const VERSION = '2.1.1';
     const LAST_MODIFIED = '2023-01-14';
     const AUTHOR_NAME = 'Hung Nguyen';
     const AUTHOR_EMAIL = 'dev@nguyenanhung.com';
@@ -50,6 +50,7 @@ class MySQLPDOBaseModel
     const OPERATOR_IS_NOT_NULL = 'IS NOT NULL';
     const ORDER_ASCENDING = 'ASC';
     const ORDER_DESCENDING = 'DESC';
+    const TABLE_OPERATOR_IS_ACTIVE = 1;
 
     /** @var \nguyenanhung\MyDebug\Logger Đối tượng khởi tạo dùng gọi đến Class Debug */
     protected $logger;
@@ -903,6 +904,53 @@ class MySQLPDOBaseModel
             foreach ($options['orderBy'] as $column => $direction) {
                 $db->orderBy($column, $direction);
             }
+        }
+
+        return $db;
+    }
+
+    public function filterRecordIsActive($db, $field = 'status')
+    {
+        $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_EQUAL_TO, self::TABLE_OPERATOR_IS_ACTIVE));
+
+        return $db;
+    }
+
+    public function filterByPrimaryId($db, $id, $field = 'id')
+    {
+        if ($id !== null) {
+            if (is_array($id)) {
+                $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_IS_IN, $id));
+            } else {
+                $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_EQUAL_TO, $id));
+            }
+        }
+
+        return $db;
+    }
+
+    public function bindRecursiveFromCategory($db, $recursive, $parentId, $field = 'categoryId')
+    {
+        if (is_array($recursive) || is_object($recursive)) {
+            /**
+             * Xác định lấy toàn bộ tin tức ở các category con
+             */
+            $countSubCategory = count($recursive); // Đếm bảng ghi Category con
+            if ($countSubCategory) {
+                // Nếu tồn tại các category con
+                $listCategory = array();
+                $listCategory[] = $parentId; // Push category cha
+                foreach ($recursive as $item) {
+                    $itemId = is_array($item) ? $item['id'] : $item->id;
+                    $listCategory[] = (int) $itemId; // Push các category con vào mảng dữ liệu
+                }
+                $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_IS_IN, $listCategory)); // Lấy theo where in
+            } else {
+                $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_EQUAL_TO, $parentId)); // lấy theo where
+            }
+        } else {
+            // Trong trường hợp so sánh tuyệt đối đối với categoryId truyền vào
+            $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_EQUAL_TO, $parentId));
         }
 
         return $db;
