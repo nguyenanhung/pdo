@@ -23,7 +23,7 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION = '2.0.9';
+    const VERSION = '2.1.0';
     const LAST_MODIFIED = '2023-01-14';
     const AUTHOR_NAME = 'Hung Nguyen';
     const AUTHOR_EMAIL = 'dev@nguyenanhung.com';
@@ -507,32 +507,7 @@ class MySQLPDOBaseModel
      */
     public function getInfo($value = '', $field = 'id', $format = null, $selectField = null)
     {
-        $this->connection();
-        $format = strtolower($format);
-        if (!empty($selectField)) {
-            if (!is_array($selectField)) {
-                $selectField = array($selectField);
-            }
-        } else {
-            $selectField = array('*');
-        }
-        $db = $this->db->select($selectField)->from($this->table);
-        $db = $this->prepareWheresStatementWithField($db, $value, $field);
-        if ($format === 'result') {
-            $result = $db->execute()->fetchAll();
-            //$this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
-        } else {
-            $result = $db->execute()->fetch();
-            //$this->logger->debug(__FUNCTION__, 'Format is get first Result => ' . json_encode($result));
-        }
-        //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
-        if ($format === 'json') {
-            //$this->logger->debug(__FUNCTION__, 'Output Result is Json');
-
-            return json_encode($result);
-        }
-
-        return $result;
+        return $this->getInfoWithMultipleWhere($value, $field, $format, $selectField);
     }
 
     /**
@@ -571,7 +546,6 @@ class MySQLPDOBaseModel
         //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
         if ($format === 'json') {
             //$this->logger->debug(__FUNCTION__, 'Output Result is Json');
-
             return json_encode($result);
         }
 
@@ -592,20 +566,7 @@ class MySQLPDOBaseModel
      */
     public function getValue($value = '', $field = 'id', $fieldOutput = '')
     {
-        $this->connection();
-        if (!is_array($fieldOutput)) {
-            $fieldOutput = array($fieldOutput);
-        }
-        $db = $this->db->select($fieldOutput)->from($this->table);
-        $db = $this->prepareWheresStatementWithField($db, $value, $field);
-        $result = $db->execute()->fetch();
-
-        //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
-        if (isset($result->$fieldOutput)) {
-            return $result->$fieldOutput;
-        }
-
-        return null;
+        return $this->getValueWithMultipleWhere($value, $field, $fieldOutput);
     }
 
     /**
@@ -629,7 +590,6 @@ class MySQLPDOBaseModel
         $db = $this->db->select($fieldOutput)->from($this->table);
         $db = $this->prepareWheresStatementWithField($db, $wheres, $field);
         $result = $db->execute()->fetch();
-
         //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
         if (isset($result->$fieldOutput)) {
             return $result->$fieldOutput;
@@ -698,15 +658,7 @@ class MySQLPDOBaseModel
         }
         $db = $this->db->select($selectField)->from($this->table);
         $db = $this->prepareWheresStatementWithField($db, $wheres);
-        if (isset($options['limit'], $options['offset']) && $options['limit'] > 0) {
-            $page = $this->preparePaging($options['offset'], $options['limit']);
-            $db->limit(new Limit($page['limit'], $page['offset']));
-        }
-        if (isset($options['orderBy']) && is_array($options['orderBy'])) {
-            foreach ($options['orderBy'] as $column => $direction) {
-                $db->orderBy($column, $direction);
-            }
-        }
+        $db = $this->prepareOptionsStatement($db, $options);
 
         // $this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
 
@@ -732,19 +684,10 @@ class MySQLPDOBaseModel
             $selectField = array($selectField);
         }
         $db = $this->db->select($selectField)->from($this->table);
-        $db = $this->prepareWheresStatement($db, $wheres);
-        if (isset($options['limit'], $options['offset']) && $options['limit'] > 0) {
-            $page = $this->preparePaging($options['offset'], $options['limit']);
-            $db->limit(new Limit($page['limit'], $page['offset']));
-        }
-        if (isset($options['orderBy']) && is_array($options['orderBy'])) {
-            foreach ($options['orderBy'] as $column => $direction) {
-                $db->orderBy($column, $direction);
-            }
-        }
+        $db = $this->prepareWheresStatementWithField($db, $wheres);
+        $db = $this->prepareOptionsStatement($db, $options);
 
         // $this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
-
         return $db->execute()->fetchAll();
     }
 
@@ -861,7 +804,19 @@ class MySQLPDOBaseModel
         return $exitCode;
     }
 
-    protected function prepareWheresStatementWithField($db, $wheres, $field = null)
+    /**
+     * Function prepareWheresStatementWithField
+     *
+     * @param $db
+     * @param $wheres
+     * @param $fields
+     *
+     * @return mixed
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 14/02/2023 16:05
+     */
+    protected function prepareWheresStatementWithField($db, $wheres, $fields = null)
     {
         if (!empty($wheres)) {
             if (is_array($wheres) && count($wheres) > 0) {
@@ -881,16 +836,27 @@ class MySQLPDOBaseModel
                     }
                 }
             } else {
-                if (empty($field)) {
-                    $field = $this->primaryKey;
+                if (empty($fields)) {
+                    $fields = $this->primaryKey;
                 }
-                $db->where(new Conditional($field, self::OPERATOR_EQUAL_TO, $wheres));
+                $db->where(new Conditional($fields, self::OPERATOR_EQUAL_TO, $wheres));
             }
         }
 
         return $db;
     }
 
+    /**
+     * Function prepareWheresStatement
+     *
+     * @param $db
+     * @param $wheres
+     *
+     * @return mixed
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 14/02/2023 15:58
+     */
     protected function prepareWheresStatement($db, $wheres)
     {
         if (!empty($wheres)) {
@@ -910,6 +876,32 @@ class MySQLPDOBaseModel
                         }
                     }
                 }
+            }
+        }
+
+        return $db;
+    }
+
+    /**
+     * Function prepareOptionsStatement
+     *
+     * @param $db
+     * @param $options
+     *
+     * @return mixed
+     * @author   : 713uk13m <dev@nguyenanhung.com>
+     * @copyright: 713uk13m <dev@nguyenanhung.com>
+     * @time     : 14/02/2023 17:29
+     */
+    protected function prepareOptionsStatement($db, $options)
+    {
+        if (isset($options['limit'], $options['offset']) && $options['limit'] > 0) {
+            $page = $this->preparePaging($options['offset'], $options['limit']);
+            $db->limit(new Limit($page['limit'], $page['offset']));
+        }
+        if (isset($options['orderBy']) && is_array($options['orderBy'])) {
+            foreach ($options['orderBy'] as $column => $direction) {
+                $db->orderBy($column, $direction);
             }
         }
 
