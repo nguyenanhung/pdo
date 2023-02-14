@@ -8,7 +8,7 @@ Database Wrapper - Base Model
 
 ## Version
 
-- [x] V1.x, V2.x support all PHP version `>5.3`
+- [x] V1.x, V2.x support all PHP version `>5.6`
 - [x] V3.x support all PHP version `>7.0`
 
 ## Support

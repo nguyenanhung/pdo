@@ -51,6 +51,7 @@ class MySQLPDOBaseModel
     const OPERATOR_IS_NOT_NULL = 'IS NOT NULL';
     const ORDER_ASCENDING = 'ASC';
     const ORDER_DESCENDING = 'DESC';
+    const TABLE_OPERATOR_IS_ACTIVE = 1;
 
     /** @var \nguyenanhung\MyDebug\Logger Đối tượng khởi tạo dùng gọi đến Class Debug */
     protected $logger;
@@ -369,7 +370,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         $db = $this->db->select($select)->from($this->table);
-        $this->prepareWheresStatementWithField($db, $wheres, $fields);
+        $db = $this->prepareWheresStatementWithField($db, $wheres, $fields);
 
         return $db->execute()->rowCount();
     }
@@ -420,7 +421,7 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table);
-        $this->prepareWheresStatementWithField($db, $wheres, $fields);
+        $db = $this->prepareWheresStatementWithField($db, $wheres, $fields);
         $db->orderBy($column, self::ORDER_DESCENDING)->limit(new Limit(1));
 
         // $this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
@@ -474,7 +475,7 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table);
-        $this->prepareWheresStatementWithField($db, $wheres, $fields);
+        $db = $this->prepareWheresStatementWithField($db, $wheres, $fields);
         $db->orderBy($column, self::ORDER_ASCENDING)->limit(new Limit(1));
 
         // $this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
@@ -529,7 +530,7 @@ class MySQLPDOBaseModel
             $selectField = array('*');
         }
         $db = $this->db->select($selectField)->from($this->table);
-        $this->prepareWheresStatementWithField($db, $wheres, $field);
+        $db = $this->prepareWheresStatementWithField($db, $wheres, $field);
         if ($format === 'result') {
             $result = $db->execute()->fetchAll();
             //$this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
@@ -583,7 +584,7 @@ class MySQLPDOBaseModel
             $fieldOutput = [$fieldOutput];
         }
         $db = $this->db->select($fieldOutput)->from($this->table);
-        $this->prepareWheresStatementWithField($db, $wheres, $field);
+        $db = $this->prepareWheresStatementWithField($db, $wheres, $field);
         $result = $db->execute()->fetch();
 
         //$this->logger->debug(__FUNCTION__, 'GET Result => ' . json_encode($result));
@@ -608,7 +609,7 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table)->distinct();
-        $this->prepareWheresStatementWithField($db, $wheres);
+        $db = $this->prepareWheresStatementWithField($db, $wheres);
 
         //$this->logger->debug(__FUNCTION__, 'Result from DB => ' . json_encode($result));
 
@@ -669,16 +670,8 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table);
-        $this->prepareWheresStatementWithField($db, $wheres);
-        if (isset($options['limit'], $options['offset']) && $options['limit'] > 0) {
-            $page = $this->preparePaging($options['offset'], $options['limit']);
-            $db->limit(new Limit($page['limit'], $page['offset']));
-        }
-        if (isset($options['orderBy']) && is_array($options['orderBy'])) {
-            foreach ($options['orderBy'] as $column => $direction) {
-                $db->orderBy($column, $direction);
-            }
-        }
+        $db = $this->prepareWheresStatementWithField($db, $wheres);
+        $db = $this->prepareOptionsStatement($db, $options);
 
         // $this->logger->debug(__FUNCTION__, 'Format is get all Result => ' . json_encode($result));
 
@@ -703,7 +696,7 @@ class MySQLPDOBaseModel
             $selectField = [$selectField];
         }
         $db = $this->db->select($selectField)->from($this->table);
-        $this->prepareWheresStatementWithField($db, $wheres);
+        $db = $this->prepareWheresStatementWithField($db, $wheres);
 
         return $db->execute()->rowCount();
     }
@@ -744,7 +737,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         $db = $this->db->update($data);
-        $this->prepareWheresStatementWithField($db, $wheres);
+        $db = $this->prepareWheresStatementWithField($db, $wheres);
         $result = $db->execute();
         //$this->logger->debug(__FUNCTION__, 'Result Update Rows: ' . $result);
         if ($result !== false) {
@@ -768,7 +761,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         $db = $this->db->delete($this->table);
-        $this->prepareWheresStatementWithField($db, $wheres);
+        $db = $this->prepareWheresStatementWithField($db, $wheres);
         $result = $db->execute();
         //$this->logger->debug(__FUNCTION__, 'Result Delete Rows: ' . $result);
         if ($result !== false) {

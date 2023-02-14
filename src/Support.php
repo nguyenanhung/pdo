@@ -11,6 +11,7 @@
 namespace nguyenanhung\PDO;
 
 use FaaPz\PDO\Clause\Conditional;
+use FaaPz\PDO\Clause\Limit;
 
 /**
  * Trait Support
@@ -66,6 +67,8 @@ trait Support
                 $db->where(new Conditional($fields, self::OPERATOR_EQUAL_TO, $wheres));
             }
         }
+
+        return $db;
     }
 
     protected function prepareWheresStatement($db, $wheres)
@@ -88,6 +91,68 @@ trait Support
                     }
                 }
             }
+        }
+
+        return $db;
+    }
+
+    protected function prepareOptionsStatement($db, $options)
+    {
+        if (isset($options['limit'], $options['offset']) && $options['limit'] > 0) {
+            $page = $this->preparePaging($options['offset'], $options['limit']);
+            $db->limit(new Limit($page['limit'], $page['offset']));
+        }
+        if (isset($options['orderBy']) && is_array($options['orderBy'])) {
+            foreach ($options['orderBy'] as $column => $direction) {
+                $db->orderBy($column, $direction);
+            }
+        }
+
+        return $db;
+    }
+
+    public function filterRecordIsActive($db, string $field = 'status')
+    {
+        $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_EQUAL_TO, self::TABLE_OPERATOR_IS_ACTIVE));
+
+        return $db;
+    }
+
+    public function filterByPrimaryId($db, $id, string $field = 'id')
+    {
+        if ($id !== null) {
+            if (is_array($id)) {
+                $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_IS_IN, $id));
+            } else {
+                $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_EQUAL_TO, $id));
+            }
+        }
+
+        return $db;
+    }
+
+    public function bindRecursiveFromCategory($db, $recursive, $parentId, string $field = 'categoryId')
+    {
+        if (is_array($recursive) || is_object($recursive)) {
+            /**
+             * Xác định lấy toàn bộ tin tức ở các category con
+             */
+            $countSubCategory = count($recursive); // Đếm bảng ghi Category con
+            if ($countSubCategory) {
+                // Nếu tồn tại các category con
+                $listCategory = array();
+                $listCategory[] = $parentId; // Push category cha
+                foreach ($recursive as $item) {
+                    $itemId = is_array($item) ? $item['id'] : $item->id;
+                    $listCategory[] = (int) $itemId; // Push các category con vào mảng dữ liệu
+                }
+                $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_IS_IN, $listCategory)); // Lấy theo where in
+            } else {
+                $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_EQUAL_TO, $parentId)); // lấy theo where
+            }
+        } else {
+            // Trong trường hợp so sánh tuyệt đối đối với categoryId truyền vào
+            $db->where(new Conditional($this->table . '.' . $field, self::OPERATOR_EQUAL_TO, $parentId));
         }
 
         return $db;
