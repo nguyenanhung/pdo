@@ -23,8 +23,8 @@ use FaaPz\PDO\Clause\Limit;
  */
 class MySQLPDOBaseModel
 {
-    const VERSION = '2.0.6';
-    const LAST_MODIFIED = '2023-01-06';
+    const VERSION = '2.0.7';
+    const LAST_MODIFIED = '2023-01-14';
     const AUTHOR_NAME = 'Hung Nguyen';
     const AUTHOR_EMAIL = 'dev@nguyenanhung.com';
     const PROJECT_NAME = 'Database Wrapper - PDO Database Model';
@@ -92,7 +92,7 @@ class MySQLPDOBaseModel
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      */
-    public function __construct(array $database = [])
+    public function __construct(array $database = array())
     {
         if (class_exists('nguyenanhung\MyDebug\Logger')) {
             $this->logger = new \nguyenanhung\MyDebug\Logger();
@@ -332,7 +332,7 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/09/2020 45:10
      */
-    public function countAll($select = ['id'])
+    public function countAll($select = array('id'))
     {
         $this->connection();
 
@@ -424,7 +424,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         if (!is_array($selectField)) {
-            $selectField = [$selectField];
+            $selectField = array($selectField);
         }
         $db = $this->db->select($selectField)->from($this->table);
         $db->orderBy($byColumn, self::ORDER_DESCENDING)->limit(new Limit(1));
@@ -446,11 +446,11 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/06/2022 28:55
      */
-    public function getLatestByColumn($wheres = array(), $selectField = '*', $column = 'id', $fields = 'id')
+    public function getLatestByColumn($wheres = array(), $selectField = array('*'), $column = 'id', $fields = 'id')
     {
         $this->connection();
         if (!is_array($selectField)) {
-            $selectField = [$selectField];
+            $selectField = array($selectField);
         }
         $db = $this->db->select($selectField)->from($this->table);
         if (!empty($wheres)) {
@@ -490,7 +490,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         if (!is_array($selectField)) {
-            $selectField = [$selectField];
+            $selectField = array($selectField);
         }
         $db = $this->db->select($selectField)->from($this->table);
         $db->orderBy($byColumn, self::ORDER_ASCENDING)->limit(new Limit(1));
@@ -513,11 +513,11 @@ class MySQLPDOBaseModel
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      * @time     : 10/06/2022 28:49
      */
-    public function getOldestByColumn($wheres = array(), $selectField = '*', $column = 'id', $fields = 'id')
+    public function getOldestByColumn($wheres = array(), $selectField = array('*'), $column = 'id', $fields = 'id')
     {
         $this->connection();
         if (!is_array($selectField)) {
-            $selectField = [$selectField];
+            $selectField = array($selectField);
         }
         $db = $this->db->select($selectField)->from($this->table);
         if (!empty($wheres)) {
@@ -562,7 +562,7 @@ class MySQLPDOBaseModel
         $format = strtolower($format);
         if (!empty($selectField)) {
             if (!is_array($selectField)) {
-                $selectField = [$selectField];
+                $selectField = array($selectField);
             }
         } else {
             $selectField = array('*');
@@ -617,7 +617,7 @@ class MySQLPDOBaseModel
         $format = strtolower($format);
         if (!empty($selectField)) {
             if (!is_array($selectField)) {
-                $selectField = [$selectField];
+                $selectField = array($selectField);
             }
         } else {
             $selectField = array('*');
@@ -670,7 +670,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         if (!is_array($fieldOutput)) {
-            $fieldOutput = [$fieldOutput];
+            $fieldOutput = array($fieldOutput);
         }
         $db = $this->db->select($fieldOutput)->from($this->table);
         if (!empty($value)) {
@@ -712,7 +712,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         if (!is_array($fieldOutput)) {
-            $fieldOutput = [$fieldOutput];
+            $fieldOutput = array($fieldOutput);
         }
         $db = $this->db->select($fieldOutput)->from($this->table);
         if (!empty($wheres)) {
@@ -752,7 +752,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         if (!is_array($selectField)) {
-            $selectField = [$selectField];
+            $selectField = array($selectField);
         }
         $db = $this->db->select($selectField)->from($this->table)->distinct();
 
@@ -794,7 +794,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         if (!is_array($selectField)) {
-            $selectField = [$selectField];
+            $selectField = array($selectField);
         }
         $db = $this->db->select($selectField)->from($this->table);
         if (!empty($wheres)) {
@@ -841,7 +841,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         if (!is_array($selectField)) {
-            $selectField = [$selectField];
+            $selectField = array($selectField);
         }
         $db = $this->db->select($selectField)->from($this->table);
         if (!empty($wheres)) {
@@ -893,7 +893,7 @@ class MySQLPDOBaseModel
     {
         $this->connection();
         if (!is_array($selectField)) {
-            $selectField = [$selectField];
+            $selectField = array($selectField);
         }
         $db = $this->db->select($selectField)->from($this->table);
 

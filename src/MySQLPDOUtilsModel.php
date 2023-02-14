@@ -28,7 +28,7 @@ class MySQLPDOUtilsModel extends MySQLPDOBaseModel
      * @author   : 713uk13m <dev@nguyenanhung.com>
      * @copyright: 713uk13m <dev@nguyenanhung.com>
      */
-    public function __construct(array $database = [])
+    public function __construct(array $database = array())
     {
         parent::__construct($database);
         $this->database = $database;
